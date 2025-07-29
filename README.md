@@ -22,6 +22,6 @@ This is a public repo built by a passionate developer currently focused on landi
 
 **Contact**
 
-Created by [Jamaal] – Software Developer & Freedom Seeker.
+Created by Jamaal – Software Developer & Freedom Seeker.
 
 If you'd like to collaborate or support the mission, feel free to reach out.
