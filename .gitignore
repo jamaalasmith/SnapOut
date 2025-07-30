@@ -1,0 +1,42 @@
+##################################
+# .NET (C# API)
+##################################
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.pdb
+*.dbmdl
+*.log
+
+# VS / VS Code
+.vscode/
+.vs/
+
+##################################
+# Node.js / Vite (React Frontend)
+##################################
+client/node_modules/
+client/dist/
+client/.env
+client/npm-debug.log
+client/yarn-debug.log
+client/yarn-error.log
+
+##################################
+# OS / Editor Junk
+##################################
+*.DS_Store
+Thumbs.db
+ehthumbs.db
+*.swp
+*.swo
+*.bak
+*.tmp
+
+##################################
+# General Logs
+##################################
+*.log
+logs/
