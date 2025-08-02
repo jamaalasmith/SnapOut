@@ -1,10 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
+
+  // Fetching data from the API endpoint
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/weatherforecast");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching weather data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -25,23 +42,6 @@ function App() {
           Edit <code>src/App.jsx</code> and save to test HMR
         </p>
       </div>
-      {fetch("/api/weatherforecast")
-        .then((response) => response.json())
-        .then((data) => (
-          <div>
-            <h2>Weather Forecast</h2>
-            <ul>
-              {data.map((forecast) => (
-                <li key={forecast.date}>
-                  {forecast.date}: {forecast.temperatureC}°C, {forecast.summary}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-        .catch((error) => (
-          <div>Error fetching weather data: {error.message}</div>
-        ))}
     </>
   );
 }
