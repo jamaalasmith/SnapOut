@@ -30,11 +30,18 @@ api.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
+    // Only handle auth errors if we have a response (server is running)
     if (error.response?.status === 401) {
       // Token expired or invalid
       Cookies.remove('token');
       window.location.href = '/login';
     }
+    
+    // Don't redirect on network errors (when API is down)
+    if (!error.response && error.code === 'ERR_NETWORK') {
+      console.warn('API server is not running. Some features may not work.');
+    }
+    
     return Promise.reject(error);
   }
 );

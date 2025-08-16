@@ -12,6 +12,12 @@ export const ROUTES = {
   EXPLORE: '/explore',
   FOLLOWERS: '/followers',
   FOLLOWING: '/following',
+  NOTIFICATIONS: '/notifications',
+  SAVED: '/saved',
+  TRENDING: '/trending',
+  ACTIVITY: '/activity',
+  SETTINGS: '/settings',
+  ACHIEVEMENTS: '/achievements',
 } as const;
 
 export const API_ENDPOINTS = {

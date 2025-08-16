@@ -10,6 +10,8 @@ export const usePosts = (page = 1, pageSize = 10) => {
     queryKey: [...QUERY_KEYS.POSTS, page, pageSize],
     queryFn: () => postService.getPosts(page, pageSize),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1, // Only retry once
+    refetchOnMount: false, // Don't refetch on mount for now
   });
 };
 

@@ -7,7 +7,7 @@ import { useUserPosts } from '../hooks/usePosts';
 import { PostCard } from '../components/ui/PostCard';
 
 const { Title, Text, Paragraph } = Typography;
-const { TabPane } = Tabs;
+// Removed deprecated TabPane import
 
 export const ProfilePage = () => {
   const { user } = useAuth();

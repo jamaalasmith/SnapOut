@@ -3,12 +3,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider } from 'antd';
 import { useAuthStore } from './stores/authStore';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
-import { MainLayout } from './components/layout/MainLayout';
+import { EnhancedMainLayout } from './components/layout/EnhancedMainLayout';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { HomePage } from './pages/HomePage';
 import { CreatePostPage } from './pages/CreatePostPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ExplorePage } from './pages/ExplorePage';
+import { NotificationsPage } from './pages/NotificationsPage';
 import { ROUTES } from './constants';
 import './App.css';
 
@@ -60,7 +62,7 @@ function App() {
               path="/"
               element={
                 <ProtectedRoute>
-                  <MainLayout />
+                  <EnhancedMainLayout />
                 </ProtectedRoute>
               }
             >
@@ -68,6 +70,8 @@ function App() {
               <Route path={ROUTES.HOME.slice(1)} element={<HomePage />} />
               <Route path={ROUTES.CREATE_POST.slice(1)} element={<CreatePostPage />} />
               <Route path={ROUTES.PROFILE.slice(1)} element={<ProfilePage />} />
+              <Route path={ROUTES.EXPLORE.slice(1)} element={<ExplorePage />} />
+              <Route path={ROUTES.NOTIFICATIONS.slice(1)} element={<NotificationsPage />} />
               
               {/* Catch all route */}
               <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
