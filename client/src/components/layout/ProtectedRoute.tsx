@@ -1,19 +1,28 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAuthStore } from '../../stores/authStore';
-import { ROUTES } from '../../constants';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated } = useAuthStore();
-  const location = useLocation();
+  const { setAuth, isAuthenticated } = useAuthStore();
 
-  if (!isAuthenticated) {
-    // Redirect to login page with return url
-    return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
-  }
+  useEffect(() => {
+    // Auto-login with demo user for development
+    if (!isAuthenticated) {
+      const demoUser = {
+        id: 'demo-123',
+        email: 'demo@snapout.com',
+        firstName: 'Demo',
+        lastName: 'User',
+        createdAt: new Date().toISOString(),
+        fullName: 'Demo User',
+        avatarUrl: undefined,
+      };
+      setAuth(demoUser, 'demo-token-123');
+    }
+  }, [isAuthenticated, setAuth]);
 
   return <>{children}</>;
 };

@@ -39,22 +39,14 @@ function App() {
       <ConfigProvider theme={antdTheme}>
         <Router>
           <Routes>
-            {/* Public routes */}
+            {/* Public routes - redirected to main app for demo */}
             <Route 
               path={ROUTES.LOGIN} 
-              element={
-                isAuthenticated ? 
-                  <Navigate to={ROUTES.HOME} replace /> : 
-                  <LoginPage />
-              } 
+              element={<Navigate to={ROUTES.HOME} replace />} 
             />
             <Route 
               path={ROUTES.REGISTER} 
-              element={
-                isAuthenticated ? 
-                  <Navigate to={ROUTES.HOME} replace /> : 
-                  <RegisterPage />
-              } 
+              element={<Navigate to={ROUTES.HOME} replace />} 
             />
             
             {/* Protected routes */}

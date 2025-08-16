@@ -8,9 +8,17 @@ import { handleApiError } from '../services/api';
 export const usePosts = (page = 1, pageSize = 10) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.POSTS, page, pageSize],
-    queryFn: () => postService.getPosts(page, pageSize),
+    queryFn: async () => {
+      try {
+        return await postService.getPosts(page, pageSize);
+      } catch (error) {
+        // Return empty array if API is not available
+        console.warn('API not available, returning empty posts');
+        return [];
+      }
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 1, // Only retry once
+    retry: false, // Don't retry for demo
     refetchOnMount: false, // Don't refetch on mount for now
   });
 };

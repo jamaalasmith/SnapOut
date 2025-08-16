@@ -46,6 +46,7 @@ export const HomePage = () => {
 
   return (
     <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 py-6">
       <Row gutter={[24, 24]}>
         {/* Left Sidebar - User Info & Quick Actions */}
         <Col xs={0} lg={6}>
@@ -319,6 +320,7 @@ export const HomePage = () => {
           </div>
         </Col>
       </Row>
+      </div>
     </div>
   );
 };
