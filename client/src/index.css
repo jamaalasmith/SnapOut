@@ -2,11 +2,7 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -24,10 +20,55 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  padding: 0;
   min-width: 320px;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#root {
+  min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Theme-specific body backgrounds */
+body[data-theme="light"] {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+body[data-theme="dark"] {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+/* Fix hover states in dark mode */
+body[data-theme="dark"] a,
+body[data-theme="dark"] a:hover,
+body[data-theme="dark"] a:active,
+body[data-theme="dark"] a:visited {
+  color: #f9fafb !important;
+}
+
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] h4,
+body[data-theme="dark"] h5,
+body[data-theme="dark"] h6 {
+  color: #f9fafb !important;
+}
+
+/* Ensure menu items stay white in dark mode */
+body[data-theme="dark"] .ant-menu-item:hover,
+body[data-theme="dark"] .ant-menu-item-selected,
+body[data-theme="dark"] .ant-menu-item:active {
+  color: #f9fafb !important;
+}
+
+body[data-theme="dark"] .ant-menu-item-selected .ant-menu-item-icon,
+body[data-theme="dark"] .ant-menu-item:hover .ant-menu-item-icon {
+  color: #f9fafb !important;
 }
 
 h1 {
@@ -35,34 +76,24 @@ h1 {
   line-height: 1.1;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
+    button {
+      border-radius: 8px;
+      border: 1px solid transparent;
+      padding: 0.6em 1.2em;
+      font-size: 1em;
+      font-weight: 500;
+      font-family: inherit;
+      background-color: #1a1a1a;
+      cursor: pointer;
+      transition: border-color 0.25s;
+    }
+  
+    button:hover {
+      border-color: #646cff;
+    }
+  
+    button:focus,
+    button:focus-visible {
+      outline: 4px auto -webkit-focus-ring-color;
+    }
+  

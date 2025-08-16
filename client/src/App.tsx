@@ -1,77 +1,84 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConfigProvider } from 'antd';
-import { useAuthStore } from './stores/authStore';
-import { ProtectedRoute } from './components/layout/ProtectedRoute';
-import { EnhancedMainLayout } from './components/layout/EnhancedMainLayout';
-import { LoginPage } from './pages/LoginPage';
-import { RegisterPage } from './pages/RegisterPage';
-import { HomePage } from './pages/HomePage';
-import { CreatePostPage } from './pages/CreatePostPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { ExplorePage } from './pages/ExplorePage';
-import { NotificationsPage } from './pages/NotificationsPage';
-import { ROUTES } from './constants';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ConfigProvider, theme } from 'antd';
+import { Layout } from './components/Layout';
+import { useThemeStore } from './stores/theme';
 
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-const antdTheme = {
-  token: {
-    colorPrimary: '#1890ff',
-    borderRadius: 6,
-  },
-};
+const { defaultAlgorithm, darkAlgorithm } = theme;
 
 function App() {
-  const { isAuthenticated } = useAuthStore();
+  const { theme: appTheme } = useThemeStore();
+
+  const antdTheme = {
+    algorithm: appTheme === 'dark' ? darkAlgorithm : defaultAlgorithm,
+    token: {
+      // Brand colors
+      colorPrimary: '#4338ca', // Nice purple-blue
+      colorSuccess: '#10b981', // Modern green
+      colorWarning: '#f59e0b', // Warm orange
+      colorError: '#ef4444', // Clean red
+      
+      // Border and surface improvements
+      borderRadius: 8,
+      borderRadiusLG: 12,
+      
+      // Dark mode specific improvements
+      ...(appTheme === 'dark' && {
+        colorBgContainer: '#1f2937', // Darker containers
+        colorBgElevated: '#374151', // Elevated surfaces
+        colorBgLayout: '#111827', // Page background
+        colorBorder: '#374151', // Borders
+        colorBorderSecondary: '#4b5563', // Secondary borders
+        colorText: '#f9fafb', // Primary text
+        colorTextSecondary: '#d1d5db', // Secondary text
+        colorTextHeading: '#f9fafb', // Heading text
+        colorLink: '#f9fafb', // Link text
+        colorLinkHover: '#f9fafb', // Link hover text
+        colorLinkActive: '#f9fafb', // Link active text
+      }),
+      
+      // Light mode specific improvements  
+      ...(appTheme === 'light' && {
+        colorBgContainer: '#ffffff', // Clean white containers
+        colorBgElevated: '#ffffff', // White elevated surfaces
+        colorBgLayout: '#f8fafc', // Very light background
+        colorBorder: '#e2e8f0', // Subtle borders
+        colorBorderSecondary: '#cbd5e1', // Secondary borders
+        // Specific component overrides for light mode
+        colorBgHeader: '#ffffff', // White header
+        colorBgSider: '#ffffff', // White sidebar
+      }),
+    },
+  };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ConfigProvider theme={antdTheme}>
-        <Router>
-          <Routes>
-            {/* Public routes - redirected to main app for demo */}
-            <Route 
-              path={ROUTES.LOGIN} 
-              element={<Navigate to={ROUTES.HOME} replace />} 
-            />
-            <Route 
-              path={ROUTES.REGISTER} 
-              element={<Navigate to={ROUTES.HOME} replace />} 
-            />
-            
-            {/* Protected routes */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <EnhancedMainLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to={ROUTES.HOME} replace />} />
-              <Route path={ROUTES.HOME.slice(1)} element={<HomePage />} />
-              <Route path={ROUTES.CREATE_POST.slice(1)} element={<CreatePostPage />} />
-              <Route path={ROUTES.PROFILE.slice(1)} element={<ProfilePage />} />
-              <Route path={ROUTES.EXPLORE.slice(1)} element={<ExplorePage />} />
-              <Route path={ROUTES.NOTIFICATIONS.slice(1)} element={<NotificationsPage />} />
-              
-              {/* Catch all route */}
-              <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-            </Route>
-          </Routes>
-        </Router>
-      </ConfigProvider>
-    </QueryClientProvider>
+    <ConfigProvider theme={antdTheme}>
+      <Router>
+        <Routes>
+          <Route path="/*" element={<Layout />}>
+            <Route index element={
+              <div style={{ padding: '20px' }}>
+                <h1>Welcome to SnapOut</h1>
+                <p>This is a simple collapsible sidebar layout with beautiful dark mode.</p>
+                <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button style={{ padding: '8px 16px', backgroundColor: '#4338ca', color: 'white', border: 'none', borderRadius: '8px' }}>
+                    Primary Button
+                  </button>
+                  <button style={{ padding: '8px 16px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '8px' }}>
+                    Success Button
+                  </button>
+                  <button style={{ padding: '8px 16px', backgroundColor: '#f59e0b', color: 'white', border: 'none', borderRadius: '8px' }}>
+                    Warning Button
+                  </button>
+                  <button style={{ padding: '8px 16px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '8px' }}>
+                    Error Button
+                  </button>
+                </div>
+              </div>
+            } />
+          </Route>
+        </Routes>
+      </Router>
+    </ConfigProvider>
   );
 }
 
