@@ -71,6 +71,23 @@ body[data-theme="dark"] .ant-menu-item:hover .ant-menu-item-icon {
   color: #f9fafb !important;
 }
 
+/* Responsive header design */
+@media (max-width: 768px) {
+  .header-search {
+    display: none !important;
+  }
+  
+  .header-user-name {
+    display: none !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-logo-text {
+    display: none !important;
+  }
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

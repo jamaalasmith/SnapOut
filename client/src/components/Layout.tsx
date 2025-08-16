@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layout as AntLayout, Button, Menu } from 'antd';
+import { Layout as AntLayout, Button, Menu, Input, Badge, Dropdown, Avatar } from 'antd';
 import { 
   MenuFoldOutlined, 
   MenuUnfoldOutlined,
@@ -7,9 +7,11 @@ import {
   UserOutlined,
   SettingOutlined,
   SunOutlined,
-  MoonOutlined
+  MoonOutlined,
+  SearchOutlined,
+  BellOutlined
 } from '@ant-design/icons';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useThemeStore } from '../stores/theme';
 
 const { Header, Sider, Content } = AntLayout;
@@ -17,22 +19,84 @@ const { Header, Sider, Content } = AntLayout;
 export const Layout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { theme, toggleTheme } = useThemeStore();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
     {
-      key: '1',
+      key: '/',
       icon: <HomeOutlined />,
       label: 'Home',
     },
     {
-      key: '2',
+      key: '/profile',
       icon: <UserOutlined />,
       label: 'Profile',
     },
     {
-      key: '3',
+      key: '/settings',
       icon: <SettingOutlined />,
       label: 'Settings',
+    },
+  ];
+
+  const handleMenuClick = ({ key }: { key: string }) => {
+    navigate(key);
+  };
+
+  // Demo notifications data
+  const notificationItems = [
+    {
+      key: '1',
+      label: (
+        <div style={{ padding: '8px 0' }}>
+          <div style={{ fontWeight: '500' }}>New follower</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>Sarah liked your profile</div>
+          <div style={{ fontSize: '11px', color: '#999' }}>2 minutes ago</div>
+        </div>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <div style={{ padding: '8px 0' }}>
+          <div style={{ fontWeight: '500' }}>Comment on post</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>John commented on your photo</div>
+          <div style={{ fontSize: '11px', color: '#999' }}>1 hour ago</div>
+        </div>
+      ),
+    },
+    {
+      key: '3',
+      label: (
+        <div style={{ padding: '8px 0' }}>
+          <div style={{ fontWeight: '500' }}>Welcome to SnapOut!</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>Complete your profile to get started</div>
+          <div style={{ fontSize: '11px', color: '#999' }}>1 day ago</div>
+        </div>
+      ),
+    },
+  ];
+
+  // Demo user menu data
+  const userMenuItems = [
+    {
+      key: 'profile',
+      label: 'View Profile',
+      onClick: () => navigate('/profile'),
+    },
+    {
+      key: 'settings',
+      label: 'Settings',
+      onClick: () => navigate('/settings'),
+    },
+    {
+      type: 'divider' as const,
+    },
+    {
+      key: 'logout',
+      label: 'Sign Out',
+      onClick: () => console.log('Sign out clicked'),
     },
   ];
 
@@ -80,28 +144,102 @@ export const Layout = () => {
         
         <Menu
           mode="inline"
-          defaultSelectedKeys={['1']}
+          selectedKeys={[location.pathname]}
           items={menuItems}
+          onClick={handleMenuClick}
           style={{ border: 'none' }}
         />
       </Sider>
       
       <AntLayout>
         <Header style={{ 
-          padding: '0 16px',
+          padding: '0 24px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          gap: '24px',
           backgroundColor: theme === 'light' ? '#ffffff' : undefined,
           borderBottom: theme === 'light' ? '1px solid #e2e8f0' : undefined,
         }}>
-          <h2 style={{ margin: 0 }}>Dashboard</h2>
-          <Button
-            type="text"
-            icon={theme === 'light' ? <MoonOutlined /> : <SunOutlined />}
-            onClick={toggleTheme}
-            title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-          />
+          {/* Left - App Branding */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 'fit-content' }}>
+            <div style={{ 
+              width: '32px', 
+              height: '32px', 
+              backgroundColor: '#2563eb', 
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '16px'
+            }}>
+              S
+            </div>
+            <h2 className="header-logo-text" style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>SnapOut</h2>
+          </div>
+
+          {/* Center - Search Bar */}
+          <div className="header-search" style={{ flex: 1, maxWidth: '400px', margin: '0 auto' }}>
+            <Input
+              placeholder="Search users, posts..."
+              prefix={<SearchOutlined style={{ color: '#666' }} />}
+              style={{ 
+                borderRadius: '20px',
+                height: '36px'
+              }}
+            />
+          </div>
+
+          {/* Right - User Actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 'fit-content' }}>
+            {/* Notifications */}
+            <Dropdown
+              menu={{ items: notificationItems }}
+              placement="bottomRight"
+              trigger={['click']}
+              overlayStyle={{ width: '300px' }}
+            >
+              <Button
+                type="text"
+                icon={
+                  <Badge count={3} size="small">
+                    <BellOutlined />
+                  </Badge>
+                }
+                title="Notifications"
+              />
+            </Dropdown>
+
+            {/* User Avatar */}
+            <Dropdown
+              menu={{ items: userMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button
+                type="text"
+                style={{ 
+                  padding: '4px 8px',
+                  height: 'auto',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Avatar size="small" icon={<UserOutlined />} />
+                <span className="header-user-name" style={{ fontSize: '14px' }}>Alex Johnson</span>
+              </Button>
+            </Dropdown>
+
+            {/* Theme Toggle */}
+            <Button
+              type="text"
+              icon={theme === 'light' ? <MoonOutlined /> : <SunOutlined />}
+              onClick={toggleTheme}
+              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            />
+          </div>
         </Header>
         
         <Content style={{ 

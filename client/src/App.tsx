@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ConfigProvider, theme } from 'antd';
 import { Layout } from './components/Layout';
+import { Profile } from './components/Profile';
 import { useThemeStore } from './stores/theme';
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
@@ -54,7 +55,7 @@ function App() {
     <ConfigProvider theme={antdTheme}>
       <Router>
         <Routes>
-          <Route path="/*" element={<Layout />}>
+          <Route path="/" element={<Layout />}>
             <Route index element={
               <div style={{ padding: '20px' }}>
                 <h1>Welcome to SnapOut</h1>
@@ -73,6 +74,13 @@ function App() {
                     Error Button
                   </button>
                 </div>
+              </div>
+            } />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={
+              <div style={{ padding: '20px' }}>
+                <h1>Settings</h1>
+                <p>Settings page coming soon...</p>
               </div>
             } />
           </Route>
