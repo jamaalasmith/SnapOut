@@ -11,11 +11,11 @@ function App() {
   const antdTheme = {
     algorithm: appTheme === 'dark' ? darkAlgorithm : defaultAlgorithm,
     token: {
-      // Brand colors
-      colorPrimary: '#4338ca', // Nice purple-blue
-      colorSuccess: '#10b981', // Modern green
-      colorWarning: '#f59e0b', // Warm orange
-      colorError: '#ef4444', // Clean red
+      // Brand colors - simple and clean
+      colorPrimary: '#2563eb', // Clean blue
+      colorSuccess: '#059669', // Standard green
+      colorWarning: '#d97706', // Standard orange
+      colorError: '#dc2626', // Standard red
       
       // Border and surface improvements
       borderRadius: 8,
@@ -60,16 +60,16 @@ function App() {
                 <h1>Welcome to SnapOut</h1>
                 <p>This is a simple collapsible sidebar layout with beautiful dark mode.</p>
                 <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button style={{ padding: '8px 16px', backgroundColor: '#4338ca', color: 'white', border: 'none', borderRadius: '8px' }}>
+                  <button style={{ padding: '8px 16px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '8px' }}>
                     Primary Button
                   </button>
-                  <button style={{ padding: '8px 16px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '8px' }}>
+                  <button style={{ padding: '8px 16px', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '8px' }}>
                     Success Button
                   </button>
-                  <button style={{ padding: '8px 16px', backgroundColor: '#f59e0b', color: 'white', border: 'none', borderRadius: '8px' }}>
+                  <button style={{ padding: '8px 16px', backgroundColor: '#d97706', color: 'white', border: 'none', borderRadius: '8px' }}>
                     Warning Button
                   </button>
-                  <button style={{ padding: '8px 16px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '8px' }}>
+                  <button style={{ padding: '8px 16px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '8px' }}>
                     Error Button
                   </button>
                 </div>
