@@ -15,6 +15,7 @@ const AppLayout = () => {
           fetch("/api/about").then((r) => r.json()),
         ]);
         setStatus(s);
+        
         setAbout(a);
       } catch (e) {
         console.error("Failed to load app data", e);
