@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using api.Services.Interfaces;
 
 namespace api.Controllers;
 
@@ -6,24 +7,24 @@ namespace api.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    // Mock user data
-    private static readonly List<object> Users = new()
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
     {
-        new { Id = 1, Name = "Alex Johnson", Email = "alex@example.com", CreatedAt = DateTime.UtcNow.AddDays(-30) },
-        new { Id = 2, Name = "Sarah Wilson", Email = "sarah@example.com", CreatedAt = DateTime.UtcNow.AddDays(-15) },
-        new { Id = 3, Name = "Mike Chen", Email = "mike@example.com", CreatedAt = DateTime.UtcNow.AddDays(-7) }
-    };
+        _userService = userService;
+    }
 
     [HttpGet]
-    public IActionResult GetUsers()
+    public async Task<IActionResult> GetUsers()
     {
-        return Ok(new { users = Users, count = Users.Count });
+        var users = await _userService.GetAllUsersAsync();
+        return Ok(new { users, count = users.Count() });
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetUser(int id)
+    public async Task<IActionResult> GetUser(int id)
     {
-        var user = Users.FirstOrDefault(u => ((dynamic)u).Id == id);
+        var user = await _userService.GetUserByIdAsync(id);
         if (user == null)
         {
             return NotFound(new { message = "User not found" });
@@ -32,15 +33,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult CreateUser([FromBody] object userData)
+    public async Task<IActionResult> CreateUser([FromBody] object userData)
     {
-        var newUser = new { 
-            Id = Users.Count + 1, 
-            Name = "New User", 
-            Email = "newuser@example.com", 
-            CreatedAt = DateTime.UtcNow 
-        };
-        
+        var newUser = await _userService.CreateUserAsync(userData);
         return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, newUser);
     }
 }

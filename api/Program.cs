@@ -1,9 +1,17 @@
+using api.Services;
+using api.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add basic services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Register application services
+builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // CORS
 builder.Services.AddCors(options =>

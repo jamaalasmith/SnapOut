@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using api.Services.Interfaces;
 
 namespace api.Controllers;
 
@@ -6,26 +7,31 @@ namespace api.Controllers;
 [Route("api/[controller]")]
 public class HomeController : ControllerBase
 {
-    [HttpGet]
-    public IActionResult Get()
+    private readonly IHomeService _homeService;
+
+    public HomeController(IHomeService homeService)
     {
-        return Ok(new { message = "SnapOut API is running", timestamp = DateTime.UtcNow, version = "1.0.0" });
+        _homeService = homeService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        var result = await _homeService.GetApiStatusAsync();
+        return Ok(result);
     }
 
     [HttpGet("health")]
-    public IActionResult Health()
+    public async Task<IActionResult> Health()
     {
-        return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
+        var result = await _homeService.GetHealthAsync();
+        return Ok(result);
     }
 
     [HttpGet("info")]
-    public IActionResult Info()
+    public async Task<IActionResult> Info()
     {
-        return Ok(new { 
-            api = "SnapOut API",
-            environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production",
-            timestamp = DateTime.UtcNow,
-            endpoints = new[] { "/api/home", "/api/home/health", "/api/home/info", "/api/users", "/api/posts" }
-        });
+        var result = await _homeService.GetApiInfoAsync();
+        return Ok(result);
     }
 }
