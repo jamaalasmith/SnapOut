@@ -8,7 +8,7 @@ public class UserService : IUserService
     // Mock user data
     private static readonly List<User> Users = new()
     {
-        new User { Id = 1, Name = "Alex Johnson", Email = "alex@example.com", CreatedAt = DateTime.UtcNow.AddDays(-30) },
+        new User { Id = 1, Name = "Jamaal Smith", Email = "jamaal@example.com", CreatedAt = DateTime.UtcNow.AddDays(-30) },
         new User { Id = 2, Name = "Sarah Wilson", Email = "sarah@example.com", CreatedAt = DateTime.UtcNow.AddDays(-15) },
         new User { Id = 3, Name = "Mike Chen", Email = "mike@example.com", CreatedAt = DateTime.UtcNow.AddDays(-7) }
     };

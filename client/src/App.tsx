@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ConfigProvider, theme } from 'antd';
 import { Layout } from './components/Layout';
 import { Profile } from './components/Profile';
+import { Posts } from './components/Posts';
 import { useThemeStore } from './stores/theme';
 import { useEffect } from 'react';
 import { homeService } from './services/homeService';
@@ -98,6 +99,7 @@ function App() {
                 </div>
               </div>
             } />
+            <Route path="/posts" element={<Posts />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={
               <div style={{ padding: '20px' }}>

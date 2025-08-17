@@ -12,12 +12,12 @@ const { Meta } = Card;
 
 export const Profile = () => {
   const demoUser = {
-    name: 'Alex Johnson',
-    username: '@alexjohnson',
-    email: 'alex.johnson@email.com',
+    name: 'Jamaal Smith',
+    username: '@jamaalsmith',
+    email: 'jamaal_smith@email.com',
     bio: 'Full-stack developer passionate about creating amazing user experiences. Love coffee, code, and good design.',
     location: 'San Francisco, CA',
-    website: 'alexjohnson.dev',
+    website: 'jamaalsmith.dev',
     joinDate: 'March 2022',
     followers: 1247,
     following: 342,
