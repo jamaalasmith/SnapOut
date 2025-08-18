@@ -1,18 +1,12 @@
 using api.Models;
 using api.Services.Interfaces;
 using Npgsql;
-using System.Data;
 
 namespace api.Services;
 
-public class UserService : IUserService
+public class UserService(IConfiguration configuration) : IUserService
 {
-    private readonly string connectionString;
-
-    public UserService(IConfiguration configuration)
-    {
-        connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException("Connection string not found");
-    }
+    private readonly string connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException("Connection string not found");
 
     public List<User> GetAllUsers()
     {
