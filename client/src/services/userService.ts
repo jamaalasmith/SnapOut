@@ -3,8 +3,13 @@ import api from "./api";
 
 export interface User {
   id: number;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  password: string;
+  passwordConfirm: string;
+  summary: string;
+  avatar: string;
   createdAt: string; // ISO UTC
 }
 
@@ -27,5 +32,10 @@ export const userService = {
   async createUser(userData: object) {
     const { data } = await api.post<User>("/api/users", userData);
     return data;
+  },
+
+  // Helper function to get full name
+  getFullName(user: User): string {
+    return `${user.firstName} ${user.lastName}`.trim();
   },
 };
