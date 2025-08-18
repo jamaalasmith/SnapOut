@@ -9,7 +9,8 @@ import {
   SunOutlined,
   MoonOutlined,
   SearchOutlined,
-  BellOutlined
+  BellOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useThemeStore } from '../stores/theme';
@@ -27,6 +28,11 @@ export const Layout = () => {
       key: '/',
       icon: <HomeOutlined />,
       label: 'Home',
+    },
+    {
+      key: '/posts',
+      icon: <FileTextOutlined />,
+      label: 'Posts',
     },
     {
       key: '/profile',
@@ -228,7 +234,7 @@ export const Layout = () => {
                 }}
               >
                 <Avatar size="small" icon={<UserOutlined />} />
-                <span className="header-user-name" style={{ fontSize: '14px' }}>Alex Johnson</span>
+                <span className="header-user-name" style={{ fontSize: '14px' }}>Jamaal Smith</span>
               </Button>
             </Dropdown>
 

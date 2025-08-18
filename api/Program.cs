@@ -1,13 +1,39 @@
-using api.Extensions;
+using api.Services;
+using api.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add application services using extension method
-builder.Services.AddApplicationServices(builder.Configuration);
+// Add basic services
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Register application services
+builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
-// Configure application pipeline using extension method
-app.ConfigureApplication();
+// Configure the HTTP request pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseCors("AllowAll");
+app.MapControllers();
 
 app.Run();

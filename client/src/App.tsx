@@ -2,7 +2,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ConfigProvider, theme } from 'antd';
 import { Layout } from './components/Layout';
 import { Profile } from './components/Profile';
+import { Posts } from './components/Posts';
 import { useThemeStore } from './stores/theme';
+import { useEffect } from 'react';
+import { homeService } from './services/homeService';
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
@@ -51,6 +54,26 @@ function App() {
     },
   };
 
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const root = await homeService.root();
+        const health = await homeService.health();
+        const info = await homeService.info();
+
+        console.log("Home API root:", root);
+        console.log("Home API health:", health);
+        console.log("Home API info:", info);
+      } catch (err) {
+        console.error("Failed to call Home API:", err);
+      }
+    }
+
+    load();
+  }, []);
+
+
   return (
     <ConfigProvider theme={antdTheme}>
       <Router>
@@ -76,6 +99,7 @@ function App() {
                 </div>
               </div>
             } />
+            <Route path="/posts" element={<Posts />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={
               <div style={{ padding: '20px' }}>

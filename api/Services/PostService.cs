@@ -1,197 +1,75 @@
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using api.Data;
-using api.Models.Entities;
-using api.Models.DTOs.Post;
+using api.Models;
 using api.Services.Interfaces;
 
 namespace api.Services;
 
 public class PostService : IPostService
 {
-    private readonly SnapOutDbContext _context;
-    private readonly IMapper _mapper;
-
-    public PostService(SnapOutDbContext context, IMapper mapper)
-    {
-        _context = context;
-        _mapper = mapper;
-    }
-
-    public async Task<IEnumerable<PostDto>> GetAllAsync(int page = 1, int pageSize = 10)
-    {
-        var posts = await _context.Posts
-            .Include(p => p.User)
-            .Include(p => p.PostTags)
-                .ThenInclude(pt => pt.Tag)
-            .Where(p => p.IsPublished)
-            .OrderByDescending(p => p.CreatedAt)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return _mapper.Map<IEnumerable<PostDto>>(posts);
-    }
-
-    public async Task<PostDto?> GetByIdAsync(int id)
-    {
-        var post = await _context.Posts
-            .Include(p => p.User)
-            .Include(p => p.PostTags)
-                .ThenInclude(pt => pt.Tag)
-            .FirstOrDefaultAsync(p => p.Id == id && p.IsPublished);
-
-        return post == null ? null : _mapper.Map<PostDto>(post);
-    }
-
-    public async Task<PostDto> CreateAsync(CreatePostDto createPostDto, string userId)
-    {
-        var post = _mapper.Map<Post>(createPostDto);
-        post.UserId = userId;
-        post.CreatedAt = DateTime.UtcNow;
-        post.UpdatedAt = DateTime.UtcNow;
-
-        _context.Posts.Add(post);
-        await _context.SaveChangesAsync();
-
-        // Add tags if provided
-        if (createPostDto.TagIds.Any())
+    // Mock post data
+    private static readonly List<Post> Posts =
+    [
+        new Post
         {
-            var postTags = createPostDto.TagIds.Select(tagId => new PostTag
-            {
-                PostId = post.Id,
-                TagId = tagId
-            }).ToList();
-
-            _context.PostTags.AddRange(postTags);
-            await _context.SaveChangesAsync();
+            Id = 1,
+            Title = "Welcome to SnapOut!",
+            Content = "This is our first post on the new platform.",
+            AuthorId = 1,
+            AuthorName = "Jamaal Smith",
+            CreatedAt = DateTime.UtcNow.AddHours(-2),
+            Likes = 5
+        },
+        new Post
+        {
+            Id = 2,
+            Title = "Building the future",
+            Content = "Excited to be working on this amazing project.",
+            AuthorId = 2,
+            AuthorName = "Sarah Smith",
+            CreatedAt = DateTime.UtcNow.AddHours(-1),
+            Likes = 3
+        },
+        new Post
+        {
+            Id = 3,
+            Title = "Great progress today",
+            Content = "The API is coming together nicely!",
+            AuthorId = 3,
+            AuthorName = "Mike Chen",
+            CreatedAt = DateTime.UtcNow.AddMinutes(-30),
+            Likes = 8
         }
+    ];
 
-        // Reload post with includes for mapping
-        var createdPost = await _context.Posts
-            .Include(p => p.User)
-            .Include(p => p.PostTags)
-                .ThenInclude(pt => pt.Tag)
-            .FirstAsync(p => p.Id == post.Id);
-
-        return _mapper.Map<PostDto>(createdPost);
+    public async Task<IEnumerable<Post>> GetAllPostsAsync()
+    {
+        return await Task.FromResult(Posts.OrderByDescending(p => p.CreatedAt));
     }
 
-    public async Task<PostDto?> UpdateAsync(int id, CreatePostDto updatePostDto, string userId)
+    public async Task<Post?> GetPostByIdAsync(int id)
     {
-        var post = await _context.Posts
-            .Include(p => p.PostTags)
-            .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
+        var post = Posts.FirstOrDefault(p => p.Id == id);
+        return await Task.FromResult(post);
+    }
 
-        if (post == null)
-            return null;
-
-        post.Title = updatePostDto.Title;
-        post.Content = updatePostDto.Content;
-        post.ImageUrl = updatePostDto.ImageUrl;
-        post.IsPublished = updatePostDto.IsPublished;
-        post.UpdatedAt = DateTime.UtcNow;
-
-        // Update tags
-        _context.PostTags.RemoveRange(post.PostTags);
-        
-        if (updatePostDto.TagIds.Any())
+    public async Task<Post> CreatePostAsync(object postData)
+    {
+        var newPost = new Post
         {
-            var postTags = updatePostDto.TagIds.Select(tagId => new PostTag
-            {
-                PostId = post.Id,
-                TagId = tagId
-            }).ToList();
-
-            _context.PostTags.AddRange(postTags);
-        }
-
-        await _context.SaveChangesAsync();
-
-        // Reload post with includes for mapping
-        var updatedPost = await _context.Posts
-            .Include(p => p.User)
-            .Include(p => p.PostTags)
-                .ThenInclude(pt => pt.Tag)
-            .FirstAsync(p => p.Id == post.Id);
-
-        return _mapper.Map<PostDto>(updatedPost);
-    }
-
-    public async Task<bool> DeleteAsync(int id, string userId)
-    {
-        var post = await _context.Posts
-            .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
-
-        if (post == null)
-            return false;
-
-        _context.Posts.Remove(post);
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<IEnumerable<PostDto>> GetByUserIdAsync(string userId, int page = 1, int pageSize = 10)
-    {
-        var posts = await _context.Posts
-            .Include(p => p.User)
-            .Include(p => p.PostTags)
-                .ThenInclude(pt => pt.Tag)
-            .Where(p => p.UserId == userId && p.IsPublished)
-            .OrderByDescending(p => p.CreatedAt)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return _mapper.Map<IEnumerable<PostDto>>(posts);
-    }
-
-    public async Task<bool> LikePostAsync(int postId, string userId)
-    {
-        var existingLike = await _context.Likes
-            .FirstOrDefaultAsync(l => l.PostId == postId && l.UserId == userId);
-
-        if (existingLike != null)
-            return false; // Already liked
-
-        var like = new Like
-        {
-            PostId = postId,
-            UserId = userId,
-            CreatedAt = DateTime.UtcNow
+            Id = Posts.Count + 1,
+            Title = "New Post",
+            Content = "This is a new post created via API",
+            AuthorId = 1,
+            AuthorName = "API User",
+            CreatedAt = DateTime.UtcNow,
+            Likes = 0
         };
 
-        _context.Likes.Add(like);
-
-        // Update post likes count
-        var post = await _context.Posts.FindAsync(postId);
-        if (post != null)
-        {
-            post.LikesCount++;
-        }
-
-        await _context.SaveChangesAsync();
-        return true;
+        return await Task.FromResult(newPost);
     }
 
-    public async Task<bool> UnlikePostAsync(int postId, string userId)
+    public async Task<IEnumerable<Post>> GetPostsByUserAsync(int userId)
     {
-        var like = await _context.Likes
-            .FirstOrDefaultAsync(l => l.PostId == postId && l.UserId == userId);
-
-        if (like == null)
-            return false; // Not liked
-
-        _context.Likes.Remove(like);
-
-        // Update post likes count
-        var post = await _context.Posts.FindAsync(postId);
-        if (post != null)
-        {
-            post.LikesCount = Math.Max(0, post.LikesCount - 1);
-        }
-
-        await _context.SaveChangesAsync();
-        return true;
+        var userPosts = Posts.Where(p => p.AuthorId == userId);
+        return await Task.FromResult(userPosts);
     }
 }

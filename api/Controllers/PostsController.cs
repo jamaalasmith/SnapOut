@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using api.Models.DTOs.Post;
 using api.Services.Interfaces;
 
 namespace api.Controllers;
@@ -18,165 +15,34 @@ public class PostsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PostDto>>> GetPosts([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetPosts()
     {
-        try
-        {
-            var posts = await _postService.GetAllAsync(page, pageSize);
-            return Ok(posts);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while retrieving posts", error = ex.Message });
-        }
+        var posts = await _postService.GetAllPostsAsync();
+        return Ok(new { posts, count = posts.Count() });
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PostDto>> GetPost(int id)
+    public async Task<IActionResult> GetPost(int id)
     {
-        try
+        var post = await _postService.GetPostByIdAsync(id);
+        if (post == null)
         {
-            var post = await _postService.GetByIdAsync(id);
-            
-            if (post == null)
-                return NotFound(new { message = "Post not found" });
-
-            return Ok(post);
+            return NotFound(new { message = "Post not found" });
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while retrieving the post", error = ex.Message });
-        }
-    }
-
-    [HttpGet("user/{userId}")]
-    public async Task<ActionResult<IEnumerable<PostDto>>> GetPostsByUser(string userId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-    {
-        try
-        {
-            var posts = await _postService.GetByUserIdAsync(userId, page, pageSize);
-            return Ok(posts);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while retrieving user posts", error = ex.Message });
-        }
+        return Ok(post);
     }
 
     [HttpPost]
-    [Authorize]
-    public async Task<ActionResult<PostDto>> CreatePost([FromBody] CreatePostDto createPostDto)
+    public async Task<IActionResult> CreatePost([FromBody] object postData)
     {
-        try
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { message = "User not authenticated" });
-
-            var post = await _postService.CreateAsync(createPostDto, userId);
-            return CreatedAtAction(nameof(GetPost), new { id = post.Id }, post);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while creating the post", error = ex.Message });
-        }
+        var newPost = await _postService.CreatePostAsync(postData);
+        return CreatedAtAction(nameof(GetPost), new { id = newPost.Id }, newPost);
     }
 
-    [HttpPut("{id}")]
-    [Authorize]
-    public async Task<ActionResult<PostDto>> UpdatePost(int id, [FromBody] CreatePostDto updatePostDto)
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetPostsByUser(int userId)
     {
-        try
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { message = "User not authenticated" });
-
-            var post = await _postService.UpdateAsync(id, updatePostDto, userId);
-            
-            if (post == null)
-                return NotFound(new { message = "Post not found or you don't have permission to update it" });
-
-            return Ok(post);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while updating the post", error = ex.Message });
-        }
-    }
-
-    [HttpDelete("{id}")]
-    [Authorize]
-    public async Task<ActionResult> DeletePost(int id)
-    {
-        try
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { message = "User not authenticated" });
-
-            var success = await _postService.DeleteAsync(id, userId);
-            
-            if (!success)
-                return NotFound(new { message = "Post not found or you don't have permission to delete it" });
-
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while deleting the post", error = ex.Message });
-        }
-    }
-
-    [HttpPost("{id}/like")]
-    [Authorize]
-    public async Task<ActionResult> LikePost(int id)
-    {
-        try
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { message = "User not authenticated" });
-
-            var success = await _postService.LikePostAsync(id, userId);
-            
-            if (!success)
-                return BadRequest(new { message = "Post already liked or not found" });
-
-            return Ok(new { message = "Post liked successfully" });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while liking the post", error = ex.Message });
-        }
-    }
-
-    [HttpDelete("{id}/like")]
-    [Authorize]
-    public async Task<ActionResult> UnlikePost(int id)
-    {
-        try
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { message = "User not authenticated" });
-
-            var success = await _postService.UnlikePostAsync(id, userId);
-            
-            if (!success)
-                return BadRequest(new { message = "Post not liked or not found" });
-
-            return Ok(new { message = "Post unliked successfully" });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while unliking the post", error = ex.Message });
-        }
+        var userPosts = await _postService.GetPostsByUserAsync(userId);
+        return Ok(new { posts = userPosts, count = userPosts.Count() });
     }
 }

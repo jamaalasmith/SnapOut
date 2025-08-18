@@ -1,192 +1,87 @@
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using api.Data;
 using api.Models;
-using api.Models.Entities;
-using api.Models.DTOs.User;
 using api.Services.Interfaces;
+using Npgsql;
+using System.Data;
 
 namespace api.Services;
 
 public class UserService : IUserService
 {
-    private readonly SnapOutDbContext _context;
-    private readonly IMapper _mapper;
+    private readonly string connectionString;
 
-    public UserService(SnapOutDbContext context, IMapper mapper)
+    public UserService(IConfiguration configuration)
     {
-        _context = context;
-        _mapper = mapper;
+        connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException("Connection string not found");
     }
 
-    public async Task<UserDto?> GetByIdAsync(string userId)
+    public List<User> GetAllUsers()
     {
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Id == userId);
-
-        return user == null ? null : _mapper.Map<UserDto>(user);
-    }
-
-    public async Task<UserProfileDto?> GetProfileAsync(string userId)
-    {
-        var userProfile = await _context.UserProfiles
-            .Include(up => up.User)
-            .FirstOrDefaultAsync(up => up.UserId == userId);
-
-        if (userProfile == null)
+        List<User> list = [];
+        using NpgsqlConnection con = new NpgsqlConnection(connectionString);
+        NpgsqlCommand cmd = new NpgsqlCommand("SELECT id, firstname, lastname, email, password, passwordconfirm, summary, avatar, createdat FROM users ORDER BY id", con);
+        con.Open();
+        NpgsqlDataReader rdr = cmd.ExecuteReader();
+        while (rdr.Read())
         {
-            // Create default profile if it doesn't exist
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return null;
-
-            userProfile = new UserProfile
+            User user = new()
             {
-                UserId = userId,
-                User = user,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                Id = Convert.ToInt32(rdr["id"]),
+                FirstName = rdr["firstname"].ToString() ?? string.Empty,
+                LastName = rdr["lastname"].ToString() ?? string.Empty,
+                Email = rdr["email"].ToString() ?? string.Empty,
+                Password = rdr["password"].ToString() ?? string.Empty,
+                PasswordConfirm = rdr["passwordconfirm"].ToString() ?? string.Empty,
+                Summary = rdr["summary"].ToString() ?? string.Empty,
+                Avatar = rdr["avatar"].ToString() ?? string.Empty,
+                CreatedAt = Convert.ToDateTime(rdr["createdat"])
             };
 
-            _context.UserProfiles.Add(userProfile);
-            await _context.SaveChangesAsync();
+            list ??= [];
+            list.Add(user);
         }
-
-        return _mapper.Map<UserProfileDto>(userProfile);
+        con.Close();
+        return list;
     }
 
-    public async Task<UserProfileDto?> UpdateProfileAsync(string userId, UserProfileDto profileDto)
+    public User? GetUserById(int id)
     {
-        var userProfile = await _context.UserProfiles
-            .Include(up => up.User)
-            .FirstOrDefaultAsync(up => up.UserId == userId);
-
-        if (userProfile == null)
+        User? user = null;
+        using NpgsqlConnection con = new NpgsqlConnection(connectionString);
+        NpgsqlCommand cmd = new NpgsqlCommand("SELECT id, firstname, lastname, email, password, passwordconfirm, summary, avatar, createdat FROM users WHERE id = @p_id", con);
+        cmd.Parameters.AddWithValue("@p_id", id);
+        con.Open();
+        NpgsqlDataReader rdr = cmd.ExecuteReader();
+        if (rdr.Read())
         {
-            // Create profile if it doesn't exist
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return null;
-
-            userProfile = new UserProfile
+            user = new User()
             {
-                UserId = userId,
-                User = user,
-                CreatedAt = DateTime.UtcNow
+                Id = Convert.ToInt32(rdr["id"]),
+                FirstName = rdr["firstname"].ToString() ?? string.Empty,
+                LastName = rdr["lastname"].ToString() ?? string.Empty,
+                Email = rdr["email"].ToString() ?? string.Empty,
+                Password = rdr["password"].ToString() ?? string.Empty,
+                PasswordConfirm = rdr["passwordconfirm"].ToString() ?? string.Empty,
+                Summary = rdr["summary"].ToString() ?? string.Empty,
+                Avatar = rdr["avatar"].ToString() ?? string.Empty,
+                CreatedAt = Convert.ToDateTime(rdr["createdat"])
             };
-            _context.UserProfiles.Add(userProfile);
         }
-
-        // Update profile fields
-        userProfile.Bio = profileDto.Bio;
-        userProfile.AvatarUrl = profileDto.AvatarUrl;
-        userProfile.Website = profileDto.Website;
-        userProfile.Location = profileDto.Location;
-        userProfile.DateOfBirth = profileDto.DateOfBirth;
-        userProfile.IsPrivate = profileDto.IsPrivate;
-        userProfile.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync();
-
-        return _mapper.Map<UserProfileDto>(userProfile);
+        con.Close();
+        return user;
     }
 
-    public async Task<IEnumerable<UserDto>> SearchUsersAsync(string searchTerm, int page = 1, int pageSize = 10)
+    public User CreateUser(object userData)
     {
-        var users = await _context.Users
-            .Where(u => u.FirstName!.Contains(searchTerm) || 
-                       u.LastName!.Contains(searchTerm) || 
-                       u.Email!.Contains(searchTerm))
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return _mapper.Map<IEnumerable<UserDto>>(users);
-    }
-
-    public async Task<bool> FollowUserAsync(string followerId, string followingId)
-    {
-        if (followerId == followingId)
-            return false; // Can't follow yourself
-
-        var existingFollow = await _context.Follows
-            .FirstOrDefaultAsync(f => f.FollowerId == followerId && f.FollowingId == followingId);
-
-        if (existingFollow != null)
-            return false; // Already following
-
-        var follow = new Follow
+        // This method would implement user creation logic
+        // For now, returning a basic user object
+        var newUser = new User
         {
-            FollowerId = followerId,
-            FollowingId = followingId,
-            CreatedAt = DateTime.UtcNow
+            Id = 0, // Would be generated by database
+            FirstName = "New",
+            LastName = "User",
+            Email = "newuser@example.com"
         };
 
-        _context.Follows.Add(follow);
-
-        // Update counts
-        var followerProfile = await _context.UserProfiles
-            .FirstOrDefaultAsync(up => up.UserId == followerId);
-        var followingProfile = await _context.UserProfiles
-            .FirstOrDefaultAsync(up => up.UserId == followingId);
-
-        if (followerProfile != null)
-            followerProfile.FollowingCount++;
-
-        if (followingProfile != null)
-            followingProfile.FollowersCount++;
-
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<bool> UnfollowUserAsync(string followerId, string followingId)
-    {
-        var follow = await _context.Follows
-            .FirstOrDefaultAsync(f => f.FollowerId == followerId && f.FollowingId == followingId);
-
-        if (follow == null)
-            return false; // Not following
-
-        _context.Follows.Remove(follow);
-
-        // Update counts
-        var followerProfile = await _context.UserProfiles
-            .FirstOrDefaultAsync(up => up.UserId == followerId);
-        var followingProfile = await _context.UserProfiles
-            .FirstOrDefaultAsync(up => up.UserId == followingId);
-
-        if (followerProfile != null)
-            followerProfile.FollowingCount = Math.Max(0, followerProfile.FollowingCount - 1);
-
-        if (followingProfile != null)
-            followingProfile.FollowersCount = Math.Max(0, followingProfile.FollowersCount - 1);
-
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<IEnumerable<UserDto>> GetFollowersAsync(string userId, int page = 1, int pageSize = 10)
-    {
-        var followers = await _context.Follows
-            .Include(f => f.Follower)
-            .Where(f => f.FollowingId == userId)
-            .Select(f => f.Follower)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return _mapper.Map<IEnumerable<UserDto>>(followers);
-    }
-
-    public async Task<IEnumerable<UserDto>> GetFollowingAsync(string userId, int page = 1, int pageSize = 10)
-    {
-        var following = await _context.Follows
-            .Include(f => f.Following)
-            .Where(f => f.FollowerId == userId)
-            .Select(f => f.Following)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return _mapper.Map<IEnumerable<UserDto>>(following);
+        return newUser;
     }
 }
