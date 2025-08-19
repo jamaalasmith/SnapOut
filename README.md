@@ -1,9 +1,5 @@
 # SnapOut
 
-A tool to help people escape the rat race
-
-"Work because you want to not because you have to"
-
 **Mission Statement**
 
 *At SnapOut, our mission is to help professionals break free from the perpetual cycle of work‑consume‑repeat so they can build diversified income, align their careers with passion, and gain the time and agency to live life on their own terms.*
