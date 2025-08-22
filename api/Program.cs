@@ -6,7 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add basic services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFilename = "api.xml";  // Use the actual filename you see
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
 
 // Register application services
 builder.Services.AddScoped<IHomeService, HomeService>();
@@ -37,3 +41,6 @@ app.UseCors("AllowAll");
 app.MapControllers();
 
 app.Run();
+
+// Make Program class accessible for testing
+public partial class Program { }
