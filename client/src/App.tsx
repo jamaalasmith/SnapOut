@@ -81,8 +81,8 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={
               <div style={{ padding: '20px' }}>
-                <h1>Welcome to SnapOut</h1>
-                <p>This is a simple collapsible sidebar layout with beautiful dark mode.</p>
+                <h1>Welcome tao SnapOut</h1>
+                <p>This is a asdfasasdfasfsimple testcollapsible sidebar layout with beautiful dark mode.</p>
                 <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <button style={{ padding: '8px 16px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '8px' }}>
                     Primary Button

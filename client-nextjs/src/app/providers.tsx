@@ -10,10 +10,31 @@ const { defaultAlgorithm, darkAlgorithm } = theme;
 export function AntdProvider({ children }: { children: React.ReactNode }) {
   const { theme: appTheme } = useThemeStore();
 
+  // Use useEffect to handle DOM updates safely for HMR
   useEffect(() => {
-    // Set initial theme on page load
     if (typeof document !== 'undefined') {
       document.body.setAttribute('data-theme', appTheme);
+      
+      // Also update the document root class for better theming
+      document.documentElement.className = appTheme;
+    }
+  }, [appTheme]);
+
+  // Development-only HMR optimization
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      // Force re-render on HMR to ensure theme consistency
+      const handleHMR = () => {
+        if (typeof document !== 'undefined') {
+          document.body.setAttribute('data-theme', appTheme);
+          document.documentElement.className = appTheme;
+        }
+      };
+      
+      // Listen for webpack HMR events
+      if (typeof window !== 'undefined' && (window as any).webpackHotUpdate) {
+        (window as any).__hmr_theme_update = handleHMR;
+      }
     }
   }, [appTheme]);
 

@@ -137,16 +137,6 @@ export const Layout = () => {
             }}
           />
         </div>
-
-        <div style={{ 
-          padding: '16px', 
-          textAlign: 'center',
-          marginTop: '32px' // Space for collapse button
-        }}>
-          <h3 style={{ margin: 0 }}>
-            {collapsed ? 'S' : 'SnapOut'}
-          </h3>
-        </div>
         
         <Menu
           mode="inline"

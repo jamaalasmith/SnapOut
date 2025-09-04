@@ -149,9 +149,7 @@ export const Layout = ({ children }: LayoutProps) => {
           textAlign: 'center',
           marginTop: '32px' // Space for collapse button
         }}>
-          <h3 style={{ margin: 0 }}>
-            {collapsed ? 'S' : 'SnapOut'}
-          </h3>
+     
         </div>
         
         <Menu
