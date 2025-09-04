@@ -25,7 +25,7 @@ export default function Home() {
   return (
     <div style={{ padding: '20px' }}>
       <h1>Welcome to SnapOut</h1>
-      <p>This is a asdfas collapsible sidebar layout with beautiful dark mode.</p>
+      <p>This is a collapsible sidebar layout with beautiful dark mode.</p>
       <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button style={{ padding: '8px 16px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '8px' }}>
           Primary Button

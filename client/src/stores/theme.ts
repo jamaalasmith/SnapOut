@@ -13,10 +13,6 @@ export const useThemeStore = create<ThemeState>()(
       theme: 'light',
       setTheme: (theme) => {
         set({ theme });
-        // Update body data attribute for CSS theming
-        if (typeof document !== 'undefined') {
-          document.body.setAttribute('data-theme', theme);
-        }
       },
       toggleTheme: () => {
         const newTheme = get().theme === 'light' ? 'dark' : 'light';
@@ -25,12 +21,7 @@ export const useThemeStore = create<ThemeState>()(
     }),
     {
       name: 'theme-store',
-      onRehydrateStorage: () => (state) => {
-        // Set initial theme on page load
-        if (state && typeof document !== 'undefined') {
-          document.body.setAttribute('data-theme', state.theme);
-        }
-      },
+      // Remove DOM manipulation from store to prevent HMR issues
     }
   )
 );

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Card, Avatar, Button, Divider, Tag, Row, Col, Spin, Alert } from 'antd';
 import { 

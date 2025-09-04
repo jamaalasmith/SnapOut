@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { Layout as AntLayout, Button, Menu, Input, Badge, Dropdown, Avatar } from 'antd';
 import { 
@@ -12,16 +14,20 @@ import {
   BellOutlined,
   FileTextOutlined
 } from '@ant-design/icons';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useRouter, usePathname } from 'next/navigation';
 import { useThemeStore } from '../stores/theme';
 
 const { Header, Sider, Content } = AntLayout;
 
-export const Layout = () => {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+export const Layout = ({ children }: LayoutProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const { theme, toggleTheme } = useThemeStore();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const menuItems = [
     {
@@ -47,7 +53,7 @@ export const Layout = () => {
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
-    navigate(key);
+    router.push(key);
   };
 
   // Demo notifications data
@@ -89,12 +95,12 @@ export const Layout = () => {
     {
       key: 'profile',
       label: 'View Profile',
-      onClick: () => navigate('/profile'),
+      onClick: () => router.push('/profile'),
     },
     {
       key: 'settings',
       label: 'Settings',
-      onClick: () => navigate('/settings'),
+      onClick: () => router.push('/settings'),
     },
     {
       type: 'divider' as const,
@@ -137,10 +143,18 @@ export const Layout = () => {
             }}
           />
         </div>
+
+        <div style={{ 
+          padding: '16px', 
+          textAlign: 'center',
+          marginTop: '32px' // Space for collapse button
+        }}>
+     
+        </div>
         
         <Menu
           mode="inline"
-          selectedKeys={[location.pathname]}
+          selectedKeys={[pathname]}
           items={menuItems}
           onClick={handleMenuClick}
           style={{ border: 'none' }}
@@ -243,8 +257,8 @@ export const Layout = () => {
           padding: 24, 
           borderRadius: '8px'
         }}>
-          <Outlet />
-        </Content>
+          {children}
+ht        </Content>
       </AntLayout>
     </AntLayout>
   );

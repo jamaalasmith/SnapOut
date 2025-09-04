@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Card, Spin, Alert, Typography, Space, Avatar } from 'antd';
 import { UserOutlined, HeartOutlined, ClockCircleOutlined } from '@ant-design/icons';
